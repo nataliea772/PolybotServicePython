@@ -1,6 +1,3 @@
-> [!IMPORTANT]
-> This project is part of the [DevOpsTheHardWay][DevOpsTheHardWay] course. Please [onboard the course][onboarding_tutorial] before starting. 
-
 
 # The Polybot Service: Python Project [![][autotest_badge]][autotest_workflow]
 
@@ -14,13 +11,16 @@ Here is a short demonstration:
 
 ## Preliminaries
 
-1. Fork this repo (read [here][fork_github] how). 
-2. Clone your forked repository into a new PyCharm project (read [here][clone_pycharm] how).   
-3. It is a good practice to create an isolated Python virtual environment specifically for your project. 
-   [Configure a new Python virtual environment in PyCharm](https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html).
+1. Fork this repo by clicking **Fork** in the top-right corner of the page. 
+2. Clone your forked repository by:
+   ```bash
+   git clone https://github.com/<your-username>/<your-project-repo-name>
+   ```
+   Change `<your-username>` and `<your-project-repo-name>` according to your GitHub username and the name you gave to your fork. E.g. `git clone https://github.com/johndoe/PolybotServicePython`.
+3. Open the repo as a code project in your favorite IDE (Pycharm, VSCode, etc..).
+   It is also a good practice to create an isolated Python virtual environment specifically for your project ([see here how to do it in PyCharm](https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html)).
 
-
-Later on, you are encouraged to change the `README.md` file content to provide relevant information about your service project, e.g. how to launch the app, main features, etc.
+Later on, you are required to change the `README.md` file content to provide relevant information about your service project, e.g. how to launch the app, main features, etc.
 
 Let's get started...
 
@@ -46,7 +46,7 @@ A color image is just a simple extension of this. The colors are constructed fro
 
 As can be seen, each pixel of the image has three channels, represent the red, green, blue values. 
 
-Python-wise, a digital grayscale image is essentially a list of lists:
+Python-wise, a digital grayscale image is essentially a matrix (list of lists):
 
 ![][python_project_pythonimage]
 
@@ -85,7 +85,6 @@ Here is a detailed usage instruction for the class:
 ### Filters for you to implement
 
 You are instructed to implement at least the following 4 filters: `concat()`, `rotate()`, `salt_n_pepper()`, `segment()`.
-You have to implement the filter using **Python builtin functionality only**. Don't use external packages like numpy, Pillow, openVC, etc. 
 
 On every error (E.g. image path doesn't exist, input image is not an RGB) you should raise a `RuntimeError` exception.
 
@@ -333,26 +332,12 @@ Time to submit your solution for testing.
 1. In [GitHub Actions][github_actions], watch the automated test execution workflow (enable Actions if needed). 
    If there are any failures, click on the failed job and **read the test logs carefully**. Fix your solution, commit and push again.
 
-### Share your project 
-
-You are highly encourages to share your project with others by creating a **Pull Request**.
-
-Create a Pull Request from your repo, branch `main` (e.g. `johndoe/ImageProcessingChatBotProject`) into our project repo (i.e. `alonitac/ImageProcessingChatBotProject`), branch `main`.  
-Feel free to explore other's pull requests to discover different solution approaches.
-
-As it's only an exercise, we may not approve your pull request (approval would lead your changes to be merged into our original project). 
-
-
 
 ## Good Luck
 
 [DevOpsTheHardWay]: https://github.com/alonitac/DevOpsTheHardWay
-[onboarding_tutorial]: https://github.com/alonitac/DevOpsTheHardWay/blob/main/tutorials/onboarding.md
-[BashProject]: https://github.com/alonitac/BashProject
 [autotest_badge]: ../../actions/workflows/project_auto_testing.yaml/badge.svg?event=push
 [autotest_workflow]: ../../actions/workflows/project_auto_testing.yaml/
-[fork_github]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo#forking-a-repository
-[clone_pycharm]: https://www.jetbrains.com/help/pycharm/set-up-a-git-repository.html#clone-repo
 [github_actions]: ../../actions
 
 [python_project_demo]: https://alonitac.github.io/DevOpsTheHardWay/img/python_project_demo.gif
