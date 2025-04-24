@@ -1,4 +1,3 @@
-
 # The Polybot Service: Python Project [![][autotest_badge]][autotest_workflow]
 
 ## Background
@@ -20,7 +19,7 @@ Here is a short demonstration:
 3. Open the repo as a code project in your favorite IDE (Pycharm, VSCode, etc..).
    It is also a good practice to create an isolated Python virtual environment specifically for your project ([see here how to do it in PyCharm](https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html)).
 
-Later on, you are required to change the `README.md` file content to provide relevant information about your service project, e.g. how to launch the app, main features, etc.
+Later on, you are **required** to change the `README.md` file content to provide relevant information about your service project, e.g. how to launch the app, main features, etc.
 
 Let's get started...
 
@@ -42,7 +41,7 @@ A grayscale image, then, can be represented as a matrix of pixel values:
 
 A color image is just a simple extension of this. The colors are constructed from a combination of Red, Green, and Blue (RGB). Instead of one matrix of pixel values, we use 3 different matrix, one for the Red (R) values, one for Green (G), and one Blue (B) values. 
 
-<img src="https://alonitac.github.io/DevOpsTheHardWay/img/python_project_colorpixels.png" width="50%">
+<img src="https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/img/python_project_colorpixels.png" width="50%">
 
 As can be seen, each pixel of the image has three channels, represent the red, green, blue values. 
 
@@ -210,8 +209,8 @@ It utilizes the Telegram Bot API to receive user images and respond with process
 The code skeleton for the bot app is already given to you under `polybot/app.py`.
 In order to run the server, you have to [provide 2 environment variables](https://www.jetbrains.com/help/objc/add-environment-variables-and-program-arguments.html#add-environment-variables):
 
-1. `TELEGRAM_TOKEN` which is your bot token.
-2. `TELEGRAM_APP_URL` which is your app public URL provided by Ngrok (will be discussed soon).
+1. `TELEGRAM_BOT_TOKEN` which is your bot token.
+2. `BOT_APP_URL` which is your app public URL provided by Ngrok (will be discussed soon).
 
 Implementing bot logic involves running a local Python script that listens for updates from Telegram servers.
 When a user sends a message to the bot, Telegram servers forward the message to the Python app using a method called **webhook** (**long-polling** and **websocket** are other possible methods which wouldn't be used in this project).
@@ -249,9 +248,13 @@ ngrok http 8443
 ```
 
 Your bot public URL is the URL specified in the `Forwarding` line (e.g. `https://16ae-2a06-c701-4501-3a00-ecce-30e9-3e61-3069.ngrok-free.app`).
-Don't forget to set the `TELEGRAM_APP_URL` env var to your URL. 
+Don't forget to set the `BOT_APP_URL` env var to your URL. 
 
 In the next step you'll finally run your bot app.
+
+> [!TIP]
+> If you want to keep the same URL each time you use ngrok, [create a static domain on your dashboard](https://dashboard.ngrok.com/cloud-edge/domains) and then use the `--url` flag to ask the ngrok agent to use it.
+
 
 ## Running a simple "echo" Bot - the `Bot` class
 
@@ -273,8 +276,10 @@ Upon incoming messages, this bot echoing the message while quoting the original 
 In `app.py`, change the instantiated instance to the `QuoteBot`:
 
 ```diff
-- Bot(TELEGRAM_TOKEN, TELEGRAM_APP_URL)
-+ QuoteBot(TELEGRAM_TOKEN, TELEGRAM_APP_URL)
+if __name__ == "__main__":
+-   bot = Bot(TELEGRAM_BOT_TOKEN, BOT_APP_URL)
++   bot = QuoteBot(TELEGRAM_BOT_TOKEN, BOT_APP_URL)
+    app.run(host='0.0.0.0', port=8443)
 ```
 
 Run this bot and check its behavior.
@@ -303,14 +308,11 @@ Test your bot on real photos and make sure it's functioning properly.
 
 ## Test your bot locally
 
-You can test your bot logic locally by:
+You can test your bot logic locally by executing the below unittests from the root directory of your project:
 
 ```bash
 python -m polybot.test.test_telegram_bot
 ```
-
-Or via the Pycharm UI. 
-
 
 ## Extend your bot functionality
 
@@ -335,16 +337,18 @@ Time to submit your solution for testing.
 
 ## Good Luck
 
-[DevOpsTheHardWay]: https://github.com/alonitac/DevOpsTheHardWay
+[DevOpsTheHardWay]: https://github.com/exit-zero-academy/DevOpsTheHardWay
 [autotest_badge]: ../../actions/workflows/project_auto_testing.yaml/badge.svg?event=push
 [autotest_workflow]: ../../actions/workflows/project_auto_testing.yaml/
+[fork_github]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo#forking-a-repository
+[clone_pycharm]: https://www.jetbrains.com/help/pycharm/set-up-a-git-repository.html#clone-repo
 [github_actions]: ../../actions
 
-[python_project_demo]: https://alonitac.github.io/DevOpsTheHardWay/img/python_project_demo.gif
-[python_project_pixel]: https://alonitac.github.io/DevOpsTheHardWay/img/python_project_pixel.gif
-[python_project_imagematrix]: https://alonitac.github.io/DevOpsTheHardWay/img/python_project_imagematrix.png
-[python_project_pythonimage]: https://alonitac.github.io/DevOpsTheHardWay/img/python_project_pythonimage.png
-[python_project_webhook1]: https://alonitac.github.io/DevOpsTheHardWay/img/python_project_webhook1.png
-[python_project_webhook2]: https://alonitac.github.io/DevOpsTheHardWay/img/python_project_webhook2.png
+[python_project_demo]: https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/img/python_project_demo.gif
+[python_project_pixel]: https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/img/python_project_pixel.gif
+[python_project_imagematrix]: https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/img/python_project_imagematrix.png
+[python_project_pythonimage]: https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/img/python_project_pythonimage.png
+[python_project_webhook1]: https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/img/python_project_webhook1.png
+[python_project_webhook2]: https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/img/python_project_webhook2.png
 
 
