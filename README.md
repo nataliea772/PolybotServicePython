@@ -10,12 +10,12 @@ Here is a short demonstration:
 
 ## Preliminaries
 
-1. Fork this repo by clicking **Fork** in the top-right corner of the page. 
-2. Clone your forked repository by:
+1. Create this repository in your account by clicking on **Use this template**, then **Create a new repository**.  
+2. Clone your repository by:
    ```bash
    git clone https://github.com/<your-username>/<your-project-repo-name>
    ```
-   Change `<your-username>` and `<your-project-repo-name>` according to your GitHub username and the name you gave to your fork. E.g. `git clone https://github.com/johndoe/PolybotServicePython`.
+   Change `<your-username>` and `<your-project-repo-name>` according to your GitHub username and the name you gave to your created repo. E.g. `git clone https://github.com/johndoe/PolybotServicePython`.
 3. Open the repo as a code project in your favorite IDE (Pycharm, VSCode, etc..).
    It is also a good practice to create an isolated Python virtual environment specifically for your project ([see here how to do it in PyCharm](https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html)).
 
@@ -340,7 +340,6 @@ Time to submit your solution for testing.
 [DevOpsTheHardWay]: https://github.com/exit-zero-academy/DevOpsTheHardWay
 [autotest_badge]: ../../actions/workflows/project_auto_testing.yaml/badge.svg?event=push
 [autotest_workflow]: ../../actions/workflows/project_auto_testing.yaml/
-[fork_github]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo#forking-a-repository
 [clone_pycharm]: https://www.jetbrains.com/help/pycharm/set-up-a-git-repository.html#clone-repo
 [github_actions]: ../../actions
 
