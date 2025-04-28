@@ -1,7 +1,6 @@
 from pathlib import Path
 from matplotlib.image import imread, imsave
 
-
 def rgb2gray(rgb):
     r, g, b = rgb[:, :, 0], rgb[:, :, 1], rgb[:, :, 2]
     gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
@@ -46,7 +45,7 @@ class Img:
         for i, row in enumerate(self.data):
             res = []
             for j in range(1, len(row)):
-                res.append(abs(row[j-1] - row[j]))
+                res.append(abs(row[j - 1] - row[j]))
 
             self.data[i] = res
 
