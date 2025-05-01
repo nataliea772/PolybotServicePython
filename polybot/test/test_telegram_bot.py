@@ -97,7 +97,8 @@ class TestBot(unittest.TestCase):
         self.assertEqual(chat_id, mock_msg['chat']['id'])
 
         contains_retry = any(keyword in text.lower() for keyword in retry_keywords)
-        self.assertTrue(contains_retry, f"Error message was not sent to the user. Make sure your message contains one of {retry_keywords}")
+        self.assertTrue(contains_retry,
+                        f"Error message was not sent to the user. Make sure your message contains one of {retry_keywords}")
 
 
 if __name__ == '__main__':

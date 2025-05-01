@@ -5,6 +5,8 @@ import time
 from telebot.types import InputFile
 from polybot.img_proc import Img
 
+user_sessions = {}
+
 
 class Bot:
 
@@ -75,4 +77,167 @@ class QuoteBot(Bot):
 
 
 class ImageProcessingBot(Bot):
-    pass
+    def handle_message(self, msg):
+        logger.info(f'Incoming message: {msg}')
+
+        chat_id = msg['chat']['id']
+        user_id = msg['from']['id']
+        text = msg.get('text', '')
+        caption = msg.get('caption', '')
+        user_input = text.lower() if text else caption.lower() if caption else ""
+        session = user_sessions.get(user_id, {'images': [], 'awaiting_direction': False})
+
+        # in case the image is sent
+        if self.is_current_msg_photo(msg):
+            try:
+                img_path = self.download_user_photo(msg)
+                session['images'].append(img_path)
+                user_sessions[user_id] = session
+            except Exception as e:
+                logger.error(f"Error downloading user photo: {e}")
+                self.send_text(chat_id, f"Error while downloading the image: {e}")
+                return
+
+        # segment
+        if user_input == "segment":
+            try:
+                logger.info(f"Applying segment for user {user_id}")
+                img = Img(session['images'][0])
+                img.segment()
+                new_path = img.save_img()
+                session['images'][-1] = new_path  # update the path in session
+                self.send_photo(chat_id, str(new_path))
+            except Exception as e:
+                self.send_text(chat_id, f"Error while segmenting image: {e}")
+            finally:
+                user_sessions[user_id] = session
+            return
+
+        # concat
+        if user_input == "concat":
+            if len(session['images']) < 2:
+                self.send_text(chat_id, "Please send at least 2 images")
+                return
+            logger.info(f"Applying concat for user {user_id}")
+            session['awaiting_direction'] = True
+            user_sessions[user_id] = session
+            self.send_text(chat_id, "Which direction? Type *horizontal* or *vertical*.", parse_mode='Markdown')
+            return
+
+        # direction input
+        if session.get('awaiting_direction'):
+            direction = text.lower()
+            if direction not in ('horizontal', 'vertical'):
+                self.send_text(chat_id, "Please type *horizontal* or *vertical*.", parse_mode='Markdown')
+                return
+            try:
+                img1 = Img(session['images'][0])
+                img2 = Img(session['images'][1])
+                img1.concat(img2, direction)
+                new_path = img1.save_img()
+                self.send_photo(chat_id, str(new_path))
+            except Exception as e:
+                logger.error(f"Error applying concat: {e}")
+                self.send_text(chat_id, f"Error while concatenating: {e}")
+            finally:
+                user_sessions[user_id] = session
+            return
+
+        # rotate
+        if user_input == "rotate":
+            if not session["images"]:
+                self.send_text(chat_id, "Please send an image first!")
+                return
+            try:
+                logger.info(f"AppLying rotate for user {user_id}")
+                img = Img(session['images'][-1])  # for loading the latest image
+                img.rotate()
+                new_path = img.save_img()
+                session['images'][-1] = new_path  # update the path in session
+                self.send_photo(chat_id, str(new_path))
+            except Exception as e:
+                logger.error(f"Error applying rotate: {e}")
+                self.send_text(chat_id, f"Error while rotating: {e}")
+            finally:
+                user_sessions[user_id] = session
+            return
+
+        # salt_n_pepper
+        if user_input == "salt and pepper":
+            if not session["images"]:
+                self.send_text(chat_id, "Please send an image first!")
+                return
+            try:
+                logger.info(f"Applying salt_n_pepper for user {user_id}")
+                img = Img(session['images'][-1])  # load the latest image
+                img.salt_n_pepper()
+                new_path = img.save_img()
+                session['images'][-1] = new_path  # update the path in session
+                self.send_photo(chat_id, str(new_path))
+            except Exception as e:
+                logger.error(f"Error applying salt_n_pepper: {e}")
+                self.send_text(chat_id, f"Error while adding noise to the image: {e}")
+            finally:
+                user_sessions[user_id] = session
+            return
+
+        # blur
+        if user_input == "blur":
+            if not session["images"]:
+                self.send_text(chat_id, "Please send an image first!")
+                return
+            try:
+                logger.info(f"Applying blur for user {user_id}")
+                img = Img(session['images'][-1])
+                img.blur()
+                new_path = img.save_img()
+                session['images'][-1] = new_path
+                self.send_photo(chat_id, str(new_path))
+            except Exception as e:
+                logger.error(f"Error applying blur: {e}")
+                self.send_text(chat_id, f"Error while blurring the image: {e}")
+            finally:
+                user_sessions[user_id] = session
+            return
+
+        # contour
+        if user_input == "contour":
+            if not session["images"]:
+                self.send_text(chat_id, "Please send an image first!")
+                return
+            try:
+                logger.info(f"Applying contour for user {user_id}")
+                img = Img(session['images'][-1])
+                img.contour()
+                new_path = img.save_img()
+                session['images'][-1] = new_path
+                self.send_photo(chat_id, str(new_path))
+            except Exception as e:
+                logger.error(f"Error applying contour: {e}")
+                self.send_text(chat_id, f"Error while applying contour to the image: {e}")
+            finally:
+                user_sessions[user_id] = session
+            return
+
+        # clear
+        if user_input == "clear":
+            session = {'images': [], 'awaiting_direction': False}
+            user_sessions[user_id] = session
+            self.send_text(chat_id, "Session cleared!")
+            return
+
+        if user_input in ("/start", "/help", "hello", "hi"):
+            self.send_text(chat_id,
+                           "👋 Hey there! I'm your image buddy - here to help you mess around with your pictures a bit\n\n"
+                           "Sooo, what can i do?\n"
+                           "- segment - highlights key parts of your image\n"
+                           "- rotate - gives your image a little spin\n"
+                           "- salt and pepper - adds a bit of noisy spice 🍿\n"
+                           "- blur - smooth out your image a bit\n"
+                           "- contour - outlines the edges in your image\n"
+                           "- concat - combine 2 images side by side or on top (here you must send 2 images!)\n"
+                           "- clear - resets everything if you want a fresh start\n\n"
+                           "Just send me a photo to begin. Then type any of the commands above <b>exactly as written<b>. \n"
+                           "I'll take care of the rest and send you back the edited image. Let's go! 🚀",
+                           parse_mode='HTML'
+                           )
