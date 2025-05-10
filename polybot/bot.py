@@ -1,3 +1,4 @@
+import requests  # for HTTP call to Yolo service
 import telebot
 from loguru import logger
 import os
@@ -219,6 +220,37 @@ class ImageProcessingBot(Bot):
                 user_sessions[user_id] = session
             return
 
+        # detect
+        if user_input == "detect":
+            if not session["images"]:
+                self.send_text(chat_id, "Please send an image first!")
+                return
+
+            yolo_url = "http://10.0.2.197:8080/predict"
+            image_path = session["images"][-1]
+
+            try:
+                logger.info(f"Sending image to YOLO server: {image_path}")
+                with open(image_path, 'rb') as img_file:
+                    response = requests.post(
+                        yolo_url,
+                        files={"file": ("image.jpg", img_file, "image/jpeg")},
+                        timeout=10
+                    )
+                    response.raise_for_status()
+                    result = response.json()
+                    objects = result.get("labels", [])
+                    if not objects:
+                        self.send_text(chat_id, "No objects detected in the image.")
+                    else:
+                        detected_list = ", ".join(objects)
+                        self.send_text(chat_id, f"Detected objects: {detected_list}")
+                self.send_photo(chat_id, str(image_path))
+            except Exception as e:
+                logger.error(f"Error calling YOLO server: {e}")
+                self.send_text(chat_id, f"Something went wrong with object detection: {e}")
+            return
+
         # clear
         if user_input == "clear":
             session = {'images': [], 'awaiting_direction': False}
@@ -236,8 +268,8 @@ class ImageProcessingBot(Bot):
                            "- blur - smooth out your image a bit\n"
                            "- contour - outlines the edges in your image\n"
                            "- concat - combine 2 images side by side or on top (here you must send 2 images!)\n"
+                           "- detect - runs object detection on your image with YOLO\n"
                            "- clear - resets everything if you want a fresh start\n\n"
                            "Just send me a photo to begin. Then type any of the commands above <b>exactly as written<b>. \n"
-                           "I'll take care of the rest and send you back the edited image. Let's go! 🚀",
-                           parse_mode='HTML'
+                           "I'll take care of the rest and send you back the edited image. Let's go! 🚀"
                            )
