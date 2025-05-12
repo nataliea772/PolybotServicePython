@@ -226,7 +226,17 @@ class ImageProcessingBot(Bot):
                 self.send_text(chat_id, "Please send an image first!")
                 return
 
-            yolo_url = "http://10.0.2.197:8080/predict"
+            ENV = os.environ.get("ENV", "dev").lower()
+            if ENV == "prod":
+                yolo_ip = os.environ.get("YOLO_PRIVATE_IP")
+                if not yolo_ip:
+                    logger.error("YOLO_PRIVATE_IP not set in prod environment.")
+                    self.send_text(chat_id, "Server error: YOLO IP not configured.")
+                    return
+                yolo_url = f"http://{yolo_ip}:8080/predict"
+            else:
+                yolo_url = "http://localhost:8080/predict"
+
             image_path = session["images"][-1]
 
             try:
@@ -245,7 +255,7 @@ class ImageProcessingBot(Bot):
                     else:
                         detected_list = ", ".join(objects)
                         self.send_text(chat_id, f"Detected objects: {detected_list}")
-                self.send_photo(chat_id, str(image_path))
+                # self.send_photo(chat_id, str(image_path))
             except Exception as e:
                 logger.error(f"Error calling YOLO server: {e}")
                 self.send_text(chat_id, f"Something went wrong with object detection: {e}")
