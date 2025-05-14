@@ -1,3 +1,6 @@
+import boto3
+from botocore.exceptions import ClientError
+from uuid import uuid4
 import requests  # for HTTP call to Yolo service
 import telebot
 from loguru import logger
@@ -8,6 +11,8 @@ from polybot.img_proc import Img
 
 user_sessions = {}
 
+S3_BUCKET = os.environ.get("S3_BUCKET", "natalie-polybot-images")
+s3_client = boto3.client('s3')
 
 class Bot:
 
@@ -226,39 +231,58 @@ class ImageProcessingBot(Bot):
                 self.send_text(chat_id, "Please send an image first!")
                 return
 
-            ENV = os.environ.get("ENV", "dev").lower()
-            if ENV == "prod":
-                yolo_ip = os.environ.get("YOLO_PRIVATE_IP")
-                if not yolo_ip:
-                    logger.error("YOLO_PRIVATE_IP not set in prod environment.")
-                    self.send_text(chat_id, "Server error: YOLO IP not configured.")
-                    return
-                yolo_url = f"http://{yolo_ip}:8080/predict"
-            else:
-                yolo_url = "http://localhost:8080/predict"
-
             image_path = session["images"][-1]
+            s3_key = f"uploads/{uuid4().hex}_{os.path.basename(image_path)}"
 
             try:
-                logger.info(f"Sending image to YOLO server: {image_path}")
-                with open(image_path, 'rb') as img_file:
-                    response = requests.post(
-                        yolo_url,
-                        files={"file": ("image.jpg", img_file, "image/jpeg")},
-                        timeout=10
-                    )
-                    response.raise_for_status()
-                    result = response.json()
-                    objects = result.get("labels", [])
-                    if not objects:
-                        self.send_text(chat_id, "No objects detected in the image.")
-                    else:
-                        detected_list = ", ".join(objects)
-                        self.send_text(chat_id, f"Detected objects: {detected_list}")
-                # self.send_photo(chat_id, str(image_path))
+                # upload to S3
+                logger.info(f"Uploading image to S3: {s3_key}")
+                s3_client.upload_file(image_path, S3_BUCKET, s3_key)
+                ENV = os.environ.get("ENV", "dev").lower()
+
+                if ENV == "prod":
+                    yolo_ip = os.environ.get("YOLO_PRIVATE_IP")
+                    if not yolo_ip:
+                        logger.error("YOLO_PRIVATE_IP not set in prod environment.")
+                        self.send_text(chat_id, "Server error: YOLO IP not configured.")
+                        return
+                    yolo_url = f"http://{yolo_ip}:8080/predict"
+                else:
+                    yolo_url = "http://localhost:8080/predict"
+
+                # Send POST request with S3 key
+                logger.info(f"Sending image key to YOLO service: {s3_key}")
+                response = requests.post(
+                    yolo_url,
+                    json={"s3_key": s3_key},
+                    timeout=10
+                )
+                response.raise_for_status()
+                result = response.json()
+                objects = result.get("labels", [])
+                annotated_key = result.get("annotated_s3_key")
+
+                if not objects:
+                    self.send_text(chat_id, "No objects detected in the image.")
+                else:
+                    detected_list = ", ".join(objects)
+                    self.send_text(chat_id, f"Detected objects: {detected_list}")
+
+                    if annotated_key:
+                        # Download the annotated image from S3
+                        annotated_path = f"downloads/{os.path.basename(annotated_key)}"
+                        os.makedirs("downloads", exist_ok=True)
+                        s3_client.download_file(S3_BUCKET, annotated_key, annotated_path)
+                        self.send_photo(chat_id, annotated_path)
+
+            except ClientError as ce:
+                logger.error(f"S3 error: {ce}")
+                self.send_text(chat_id, f"Error accessing S3: {ce}")
+
             except Exception as e:
-                logger.error(f"Error calling YOLO server: {e}")
+                logger.error(f"Error during YOLO detection: {e}")
                 self.send_text(chat_id, f"Something went wrong with object detection: {e}")
+
             return
 
         # clear
