@@ -1,0 +1,12 @@
+[Unit]
+Description=Polybot Prod Service
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/PolybotServicePython
+ExecStart=/home/ubuntu/PolybotServicePython/.venv/bin/python3 polybot/app.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
