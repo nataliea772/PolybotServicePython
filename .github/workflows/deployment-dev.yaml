@@ -1,0 +1,23 @@
+name: Deploy to Dev EC2
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY_DEV }}" > key.pem
+          chmod 600 key.pem
+
+      - name: Deploy to Dev Server
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@54.67.5.254 'bash -s' < ./deploy-dev.sh
