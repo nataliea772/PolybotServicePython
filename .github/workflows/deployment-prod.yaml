@@ -1,0 +1,24 @@
+# .GitHub/workflows/deployment-prod.yaml
+name: Deploy to Prod Polybot
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup SSH and deploy to prod EC2
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.PROD_POLYBOT_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
+          script: |
+            bash /home/ubuntu/deploy-prod.sh
