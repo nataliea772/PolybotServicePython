@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/PolybotServicePython
-ExecStart=/usr/bin/python3 main.py --token 7807497366:AAF7_Ks5kendbf6TdZboyqQifSmGO3zoW60 --env prod
+ExecStart=/usr/bin/python3 app.py --token 7807497366:AAF7_Ks5kendbf6TdZboyqQifSmGO3zoW60 --env prod
 Restart=always
 
 [Install]
