@@ -29,3 +29,4 @@ jobs:
           script: |
             echo "RUNNING: bash /home/ubuntu/deploy-dev.sh"
             bash /home/ubuntu/deploy-dev.sh
+          debug: true
