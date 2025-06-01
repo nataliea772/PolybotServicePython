@@ -5,8 +5,12 @@ After=network.target
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/PolybotServicePython
-ExecStart=/usr/bin/python3 app.py --token 7294009888:AAHocT7LATpy7SK7LWWUPjzem8PcjiQ3LZU --env dev
+Environment="TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}"
+Environment="BOT_APP_URL=${BOT_APP_URL}"
+ExecStart=/home/ubuntu/PolybotServicePython/.venv/bin/python3 -m polybot.app
 Restart=always
+RestartSec=5
+EnvironmentFile=/home/ubuntu/PolybotServicePython/.env
 
 [Install]
 WantedBy=multi-user.target

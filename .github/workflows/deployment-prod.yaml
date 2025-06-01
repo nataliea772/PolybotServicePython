@@ -21,6 +21,5 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
           script: |
+            echo "RUNNING: bash /home/ubuntu/deploy-prod.sh"
             bash /home/ubuntu/deploy-prod.sh
-
-# Test line for dev deploy
