@@ -1,12 +1,13 @@
 [Unit]
-Description=Polybot Prod Service
+Description=Polybot Dev Service
 After=network.target
 
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/PolybotServicePython
-ExecStart=/usr/bin/python3 app.py --token 7807497366:AAF7_Ks5kendbf6TdZboyqQifSmGO3zoW60 --env prod
+ExecStart=/home/ubuntu/PolybotServicePython/deploy-prod.sh
 Restart=always
+EnvironmentFile=/home/ubuntu/PolybotServicePython/.env
 
 [Install]
 WantedBy=multi-user.target
