@@ -5,9 +5,16 @@ After=network.target
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/PolybotServicePython
-ExecStart=/home/ubuntu/PolybotServicePython/deploy-dev.sh
+Environment=TELEGRAM_BOT_TOKEN=7294009888:AAHocT7LATpy7SK7LWWUPjzem8PcjiQ3LZU
+Environment=BOT_APP_URL=https://10.0.0.110/dev
+Environment=YOLO_URL=http://10.0.1.69:8080
+Environment=BUCKET_NAME="polybot-dev-bucket-natalie"
+Environment=PYTHONPATH=/home/ubuntu/PolybotServicePython
+ExecStart=/home/ubuntu/PolybotServicePython/venv/bin/python3 /home/ubuntu/PolybotServicePython/polybot/app.py --port
 Restart=always
-EnvironmentFile=/home/ubuntu/PolybotServicePython/.env
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
