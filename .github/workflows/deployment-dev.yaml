@@ -1,3 +1,5 @@
+# .github/workflows/deployment-dev.yaml
+
 name: Deploy to Dev Polybot
 
 on:
@@ -13,11 +15,17 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Setup SSH and deploy to dev EC2
+      - name: Print debugging info
+        run: |
+          echo "Branch ref: ${{ github.ref }}"
+          echo "Running deploy-dev.sh on DEV EC2"
+
+      - name: SSH into Dev EC2 and deploy
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.DEV_POLYBOT_HOST }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
           script: |
+            echo "RUNNING: bash /home/ubuntu/deploy-dev.sh"
             bash /home/ubuntu/deploy-dev.sh
