@@ -22,5 +22,3 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
           script: |
             bash /home/ubuntu/deploy-prod.sh
-
-# Test line for dev deploy
