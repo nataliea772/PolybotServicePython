@@ -5,9 +5,8 @@ After=network.target
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/PolybotServicePython
-ExecStart=/home/ubuntu/PolybotServicePython/deploy-dev.sh
+ExecStart=/usr/bin/python3 app.py --token 7294009888:AAHocT7LATpy7SK7LWWUPjzem8PcjiQ3LZU --env dev
 Restart=always
-EnvironmentFile=/home/ubuntu/PolybotServicePython/.env
 
 [Install]
 WantedBy=multi-user.target
