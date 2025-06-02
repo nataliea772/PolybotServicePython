@@ -6,7 +6,7 @@ After=network.target
 User=ubuntu
 WorkingDirectory=/home/ubuntu/PolybotServicePython
 Environment=TELEGRAM_BOT_TOKEN=7294009888:AAHocT7LATpy7SK7LWWUPjzem8PcjiQ3LZU
-Environment=BOT_APP_URL=https://10.0.0.110/dev
+Environment=BOT_APP_URL=https://measured-whole-chicken.ngrok-free.app
 Environment=YOLO_URL=http://10.0.1.69:8080
 Environment=BUCKET_NAME="polybot-dev-bucket-natalie"
 Environment=PYTHONPATH=/home/ubuntu/PolybotServicePython
