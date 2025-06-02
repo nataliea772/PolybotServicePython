@@ -1,12 +1,20 @@
 [Unit]
-Description=Polybot Prod Service
+Description=Polybot Dev Service
 After=network.target
 
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/PolybotServicePython
-ExecStart=/usr/bin/python3 app.py --token 7807497366:AAF7_Ks5kendbf6TdZboyqQifSmGO3zoW60 --env prod
+Environment=TELEGRAM_BOT_TOKEN=7807497366:AAF7_Ks5kendbf6TdZboyqQifSmGO3zoW60
+Environment=BOT_APP_URL=https://measured-whole-chicken.ngrok-free.app
+Environment=YOLO_URL=http://10.0.1.183:8080
+Environment=BUCKET_NAME="polybot-dev-bucket-natalie"
+Environment=PYTHONPATH=/home/ubuntu/PolybotServicePython
+ExecStart=/home/ubuntu/PolybotServicePython/venv/bin/python3 /home/ubuntu/PolybotServicePython/polybot/app.py --port
 Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
