@@ -19,6 +19,6 @@ jobs:
         with:
           host: ${{ secrets.PROD_POLYBOT_HOST }}
           username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_PROD }}
           script: |
             bash /home/ubuntu/deploy-prod.sh
