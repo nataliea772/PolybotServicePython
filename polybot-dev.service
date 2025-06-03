@@ -10,7 +10,7 @@ Environment=BOT_APP_URL=https://measured-whole-chicken.ngrok-free.app
 Environment=YOLO_PRIVATE_IP=http://10.0.1.69:8080
 Environment=BUCKET_NAME="polybot-dev-bucket-natalie"
 Environment=PYTHONPATH=/home/ubuntu/PolybotServicePython
-ExecStart=/home/ubuntu/PolybotServicePython/venv/bin/python3 /home/ubuntu/PolybotServicePython/polybot/app.py --port
+ExecStart=/home/ubuntu/PolybotServicePython/.venv/bin/python3 /home/ubuntu/PolybotServicePython/polybot/app.py --port
 Restart=always
 RestartSec=5
 StandardOutput=journal
