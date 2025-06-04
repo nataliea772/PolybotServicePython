@@ -16,9 +16,18 @@ def index():
 
 @app.route(f'/{TELEGRAM_BOT_TOKEN}/', methods=['POST'])
 def webhook():
-    req = request.get_json()
-    bot.handle_message(req['message'])
-    return 'Ok'
+    try:
+        req = request.get_json()
+        print("Webhook received:", req)  # Log raw request
+        message = req.get('message')
+        if not message:
+            print("No message found in request")
+            return 'Missing message', 400
+        bot.handle_message(req['message'])
+        return 'Ok'
+    except Exception as e:
+        print("Error in webhook:", str(e))
+        return 'Internal Error', 500
 
 
 bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, BOT_APP_URL)
