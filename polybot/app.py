@@ -25,4 +25,8 @@ bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, BOT_APP_URL)
 
 if __name__ == "__main__":
     bot.setWebhook(f"{BOT_APP_URL}/{TELEGRAM_BOT_TOKEN}/")  #This tells Telegram where to send updates
+    context = (
+        "/home/ubuntu/fullchain.pem",      # Cert
+        "/home/ubuntu/privkey.pem",        # Private key you also need to copy
+    )
     app.run(host='0.0.0.0', port=8443)
