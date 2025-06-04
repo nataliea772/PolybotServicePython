@@ -23,21 +23,11 @@ class Bot:
         # set the webhook URL
         # self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60)
 
-        CERTIFICATE_FILE_PATH = "polybot.crt"
-
-        if os.path.exists(CERTIFICATE_FILE_PATH):
-            with open(CERTIFICATE_FILE_PATH, 'r') as cert:
-                self.telegram_bot_client.set_webhook(
-                    url=f'{telegram_chat_url}/{token}/',
-                    certificate=cert,
-                    timeout=60
-                )
-        else:
-            # Skip certificate for testing or fallback
-            self.telegram_bot_client.set_webhook(
-                url=f'{telegram_chat_url}/{token}/',
-                timeout=60
-            )
+        # Using Let's Encrypt, so no need to upload certificate
+        self.telegram_bot_client.set_webhook(
+            url=f'{telegram_chat_url}/{token}/',
+            timeout=60
+        )
 
         logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
 
