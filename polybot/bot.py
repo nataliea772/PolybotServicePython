@@ -27,7 +27,7 @@ class Bot:
 
         with open(CERTIFICATE_FILE_PATH, 'r') as cert:
             self.telegram_bot_client.set_webhook(
-                url=f'{telegram_chat_url}/{token}/',
+                url=f'https://natalie-bot.fursa.click/{token}/',
                 certificate=cert,
                 timeout=60
             )
