@@ -6,11 +6,11 @@ After=network.target
 User=ubuntu
 WorkingDirectory=/home/ubuntu/PolybotServicePython
 Environment=TELEGRAM_BOT_TOKEN=7294009888:AAHocT7LATpy7SK7LWWUPjzem8PcjiQ3LZU
-Environment=BOT_APP_URL=https://measured-whole-chicken.ngrok-free.app
+Environment=BOT_APP_URL=https://natalie-bot.fursa.click
 Environment=YOLO_PRIVATE_IP=http://10.0.1.69:8080
 Environment=BUCKET_NAME="polybot-dev-bucket-natalie"
 Environment=PYTHONPATH=/home/ubuntu/PolybotServicePython
-ExecStart=/home/ubuntu/PolybotServicePython/venv/bin/python3 /home/ubuntu/PolybotServicePython/polybot/app.py --port
+ExecStart=/home/ubuntu/PolybotServicePython/.venv/bin/python3 /home/ubuntu/PolybotServicePython/polybot/app.py --port
 Restart=always
 RestartSec=5
 StandardOutput=journal
