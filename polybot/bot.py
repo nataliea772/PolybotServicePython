@@ -25,17 +25,10 @@ class Bot:
 
         CERTIFICATE_FILE_PATH = "polybot.crt"
 
-        if os.path.exists(CERTIFICATE_FILE_PATH):
-            with open(CERTIFICATE_FILE_PATH, 'r') as cert:
-                self.telegram_bot_client.set_webhook(
-                    url=f'{telegram_chat_url}/{token}/',
-                    certificate=cert,
-                    timeout=60
-                )
-        else:
-            # Skip certificate for testing or fallback
+        with open(CERTIFICATE_FILE_PATH, 'r') as cert:
             self.telegram_bot_client.set_webhook(
                 url=f'{telegram_chat_url}/{token}/',
+                certificate=cert,
                 timeout=60
             )
 
