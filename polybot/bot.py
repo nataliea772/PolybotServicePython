@@ -235,16 +235,23 @@ class ImageProcessingBot(Bot):
                 self.send_text(chat_id, "Please send an image first!")
                 return
 
-            ENV = os.environ.get("ENV", "dev").lower()
-            if ENV == "prod":
-                yolo_ip = os.environ.get("YOLO_PRIVATE_IP")
-                if not yolo_ip:
-                    logger.error("YOLO_PRIVATE_IP not set in prod environment.")
-                    self.send_text(chat_id, "Server error: YOLO IP not configured.")
-                    return
-                yolo_url = f"http://{yolo_ip}:8080/predict"
-            else:
-                yolo_url = "http://localhost:8080/predict"
+            # ENV = os.environ.get("ENV", "dev").lower()
+            # if ENV == "prod":
+            #     yolo_ip = os.environ.get("YOLO_PRIVATE_IP")
+            #     if not yolo_ip:
+            #         logger.error("YOLO_PRIVATE_IP not set in prod environment.")
+            #         self.send_text(chat_id, "Server error: YOLO IP not configured.")
+            #         return
+            #     yolo_url = f"http://{yolo_ip}:8080/predict"
+            # else:
+            #     yolo_url = "http://localhost:8080/predict"
+
+            yolo_ip = os.environ.get("YOLO_PRIVATE_IP")
+            if not yolo_ip:
+                logger.error("YOLO_PRIVATE_IP not set in environment.")
+                self.send_text(chat_id, "Server error: YOLO IP not configured.")
+                return
+            yolo_url = f"{yolo_ip}/predict"
 
             image_path = session["images"][-1]
 
