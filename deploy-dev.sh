@@ -29,7 +29,7 @@ BOT_TOKEN=$(grep TELEGRAM_BOT_TOKEN .env | cut -d '=' -f2)
 WEBHOOK_URL="https://natalie-bot-dev.fursa.click/$BOT_TOKEN"
 
 curl -s -F "url=$WEBHOOK_URL" \
-     -F "certificate=@/etc/nginx/ssl/polybot_dev.crt" \
+     -F "certificate=@polybot/polybot_dev.crt" \
      https://api.telegram.org/bot$BOT_TOKEN/setWebhook
 
 echo "Copying service file..."
