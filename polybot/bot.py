@@ -236,7 +236,7 @@ class ImageProcessingBot(Bot):
                 return
 
             ENV = os.environ.get("ENV", "dev").lower()
-            if ENV == "prod":
+            if ENV == "prod" or ENV == "dev":
                 yolo_ip = os.environ.get("YOLO_PRIVATE_IP")
                 if not yolo_ip:
                     logger.error("YOLO_PRIVATE_IP not set in prod environment.")
