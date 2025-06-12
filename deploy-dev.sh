@@ -10,7 +10,8 @@ sudo systemctl stop $SERVICE_FILE || true
 
 echo "Pulling latest code from GitHub..."
 cd $PROJECT_DIR || exit 1
-git pull origin dev
+git fetch origin dev
+git reset --hard origin/dev
 
 echo "Setting up Python virtual environment..."
 if [ ! -d ".venv" ]; then
