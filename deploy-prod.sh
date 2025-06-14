@@ -1,37 +1,31 @@
 #!/bin/bash
 
+# Define the application name and the Docker image
 APP_NAME=polybot
-SERVICE_FILE=polybot-prod.service
-SERVICE_PATH="/etc/systemd/system/$SERVICE_FILE"
-PROJECT_DIR="/home/ubuntu/PolybotServicePython"
+IMAGE_NAME=polybot-image
+CONTAINER_NAME=polybot-container
 
-echo "Stopping existing service..."
-sudo systemctl stop $SERVICE_FILE || true
+# Stop the existing container (if it exists)
+echo "Stopping existing container..."
+docker stop $CONTAINER_NAME || true
+docker rm $CONTAINER_NAME || true
 
+# Pull the latest code from GitHub (if you're using Git for the app)
 echo "Pulling latest code from GitHub..."
-cd $PROJECT_DIR || exit 1
-git pull origin main
+git fetch origin main
+git reset --hard origin/main
 
-echo "Setting up Python virtual environment..."
-if [ ! -d ".venv" ]; then
-  python3 -m venv .venv
-fi
+# Build the Docker image
+echo "Building Docker image..."
+docker build -t $IMAGE_NAME .
 
-echo "Activating venv..."
-source .venv/bin/activate
+# Run the Docker container with environment variables
+echo "Starting the container..."
+docker run -d -p 8889:8889 --name $CONTAINER_NAME \
+  -e TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN} \
+  -e BOT_APP_URL=${BOT_APP_URL} \
+  $IMAGE_NAME
 
-echo "Upgrading pip and installing dependencies..."
-pip install --upgrade pip
-pip install -r requirements.txt
-
-echo "Copying service file..."
-sudo cp $SERVICE_FILE $SERVICE_PATH
-
-echo "Reloading systemd daemon..."
-sudo systemctl daemon-reload
-
-echo "Starting service..."
-sudo systemctl start $SERVICE_FILE
-
+# Check the container status
 echo "Service status:"
-sudo systemctl status $SERVICE_FILE --no-pager
+docker ps --filter "name=$CONTAINER_NAME"
