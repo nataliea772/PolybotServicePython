@@ -27,6 +27,6 @@ jobs:
           script: |
             echo "RUNNING: bash /home/ubuntu/deploy-dev.sh"
             bash /home/ubuntu/deploy-dev.sh
-          env:
-            TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-            BOT_APP_URL: ${{ secrets.BOT_APP_URL }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          BOT_APP_URL: ${{ secrets.BOT_APP_URL }}
