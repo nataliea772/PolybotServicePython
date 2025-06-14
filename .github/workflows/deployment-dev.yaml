@@ -26,6 +26,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
           script: |
             echo "RUNNING: bash /home/ubuntu/deploy-dev.sh"
-            export TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
-            export BOT_APP_URL=${{ secrets.BOT_APP_URL }}
             bash /home/ubuntu/deploy-dev.sh
