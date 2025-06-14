@@ -23,19 +23,18 @@ class Bot:
         # set the webhook URL
         # self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60)
 
-        CERTIFICATE_FILE_PATH = "polybot.crt"
+        # CERTIFICATE_FILE_PATH = "polybot_dev.crt"
 
-        if os.path.exists(CERTIFICATE_FILE_PATH):
-            with open(CERTIFICATE_FILE_PATH, 'r') as cert:
-                self.telegram_bot_client.set_webhook(
-                    url=f'{telegram_chat_url}/{token}/',
-                    certificate=cert,
-                    timeout=60
-                )
-        else:
-            # Skip certificate for testing or fallback
+        ENV = os.environ.get("ENV", "dev").lower()
+        if ENV == "dev":
+            CERTIFICATE_FILE_PATH = "polybot_dev.crt"
+        elif ENV == "prod":
+            CERTIFICATE_FILE_PATH = "polybot.crt"
+
+        with open(CERTIFICATE_FILE_PATH, 'r') as cert:
             self.telegram_bot_client.set_webhook(
                 url=f'{telegram_chat_url}/{token}/',
+                certificate=cert,
                 timeout=60
             )
 
@@ -243,7 +242,7 @@ class ImageProcessingBot(Bot):
                 return
 
             ENV = os.environ.get("ENV", "dev").lower()
-            if ENV == "prod":
+            if ENV == "prod" or ENV == "dev":
                 yolo_ip = os.environ.get("YOLO_PRIVATE_IP")
                 if not yolo_ip:
                     logger.error("YOLO_PRIVATE_IP not set in prod environment.")
@@ -252,6 +251,13 @@ class ImageProcessingBot(Bot):
                 yolo_url = f"http://{yolo_ip}:8080/predict"
             else:
                 yolo_url = "http://localhost:8080/predict"
+
+            # yolo_ip = os.environ.get("YOLO_PRIVATE_IP")
+            # if not yolo_ip:
+            #     logger.error("YOLO_PRIVATE_IP not set in environment.")
+            #     self.send_text(chat_id, "Server error: YOLO IP not configured.")
+            #     return
+            # yolo_url = f"{yolo_ip}/predict"
 
             image_path = session["images"][-1]
 

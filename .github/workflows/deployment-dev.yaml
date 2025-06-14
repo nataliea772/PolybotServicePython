@@ -1,5 +1,3 @@
-# .GitHub/workflows/deployment-dev.yaml
-
 name: Deploy to Dev Polybot
 
 on:
@@ -15,10 +13,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Print debugging info
+      - name: Set up environment variables for Docker
         run: |
-          echo "Branch ref: ${{ github.ref }}"
-          echo "Running deploy-dev.sh on DEV EC2"
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> $GITHUB_ENV
+          echo "BOT_APP_URL=${{ secrets.BOT_APP_URL }}" >> $GITHUB_ENV
 
       - name: SSH into Dev EC2 and deploy
         uses: appleboy/ssh-action@v0.1.6
