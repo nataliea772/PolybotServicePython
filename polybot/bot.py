@@ -27,7 +27,7 @@ class Bot:
 
         ENV = os.environ.get("ENV", "dev").lower()
         if ENV == "dev":
-            CERTIFICATE_FILE_PATH = "polybot_dev.crt"
+            CERTIFICATE_FILE_PATH = "polybot-dev.crt"
         elif ENV == "prod":
             CERTIFICATE_FILE_PATH = "polybot.crt"
 
