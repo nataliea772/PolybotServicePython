@@ -27,9 +27,9 @@ class Bot:
 
         ENV = os.environ.get("ENV", "dev").lower()
         if ENV == "dev":
-            CERTIFICATE_FILE_PATH = "polybot-dev.crt"
+            CERTIFICATE_FILE_PATH = "/app/polybot/polybot-dev.crt"
         elif ENV == "prod":
-            CERTIFICATE_FILE_PATH = "polybot.crt"
+            CERTIFICATE_FILE_PATH = "/app/polybot/polybot.crt"
 
         with open(CERTIFICATE_FILE_PATH, 'r') as cert:
             self.telegram_bot_client.set_webhook(
