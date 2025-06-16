@@ -1,0 +1,40 @@
+name: Build and Deploy Polybot Dev
+
+on:
+  push:
+    branches:
+      - dev  # This will trigger the workflow whenever you push to the dev branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Use an Ubuntu machine to build the Docker image
+
+    steps:
+      # Checkout the code from GitHub
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Build the Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t polybot-image .
+
+      # Deploy to EC2 instance (use SSH to run the necessary commands on EC2)
+      - name: SSH into EC2 and run Docker container
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.DEV_POLYBOT_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
+          script: |
+            docker stop polybot-container || true
+            docker rm polybot-container || true
+            docker run -d -p 8080:8080 --name polybot-container \
+              -e TELEGRAM_BOT_TOKEN="${{ secrets.TELEGRAM_BOT_TOKEN }}" \
+              -e BOT_APP_URL="${{ secrets.BOT_APP_URL }}" \
+              -e ENV="dev" \
+              polybot-image
