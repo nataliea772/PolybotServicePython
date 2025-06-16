@@ -21,20 +21,5 @@ jobs:
       # Build the Docker image
       - name: Build Docker image
         run: |
-          docker build -t polybot-image .
-
-      # Deploy to EC2 instance (use SSH to run the necessary commands on EC2)
-      - name: SSH into EC2 and run Docker container
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.DEV_POLYBOT_HOST }}
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
-          script: |
-            docker stop polybot-container || true
-            docker rm polybot-container || true
-            docker run -d -p 8080:8080 --name polybot-container \
-              -e TELEGRAM_BOT_TOKEN="${{ secrets.TELEGRAM_BOT_TOKEN }}" \
-              -e BOT_APP_URL="${{ secrets.BOT_APP_URL }}" \
-              -e ENV="dev" \
-              polybot-image
+          docker login -u username -p psw (save in secret)
+          docker build --push -t username/polybot-image .
