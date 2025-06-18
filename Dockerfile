@@ -10,4 +10,4 @@ COPY . .
 RUN pip install -r ./polybot/requirements.txt
 
 # Define the default command to run your application
-CMD ["python", "-m", "polybot.app"]
+CMD ["python", "polybot/app.py"]
