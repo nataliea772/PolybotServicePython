@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   polybot:
     image: ${IMG_NAME}
@@ -26,10 +28,12 @@ services:
     environment:
       - HOST_PROC=/host_proc
       - HOST_SYS=/host_sys
-    network_mode: host
+    networks:
+      - observability
     depends_on:
       polybot:
         condition: service_healthy
 
 networks:
   observability:
+    driver: bridge
