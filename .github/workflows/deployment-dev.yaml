@@ -93,6 +93,8 @@ jobs:
             else
               git clone --branch dev https://github.com/${{ github.repository }} PolybotServicePython
               cd PolybotServicePython
+              git checkout dev
+              git pull origin dev
             fi
           
             echo " Checking .env file contents on server:"
