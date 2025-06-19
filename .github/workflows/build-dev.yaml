@@ -7,19 +7,18 @@ on:
         required: true
         type: string
 
-
     secrets:
       EC2_SSH_KEY:
         required: true
       POLYBOT_EC2_IP_DEV:
         required: true
-      TELEGRAM_BOT_TOKEN_DEV:
+      TELEGRAM_BOT_TOKEN:
         required: true
-      BOT_APP_URL_DEV:
+      BOT_APP_URL:
         required: true
-      YOLO_SERVER_URL_DEV:
+      YOLO_SERVER_URL:
         required: true
-      S3_BUCKET_NAME_DEV:
+      S3_BUCKET_NAME:
         required: true
 
   workflow_dispatch:
@@ -36,13 +35,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Download image name artifact (fallback)
-        uses: actions/download-artifact@v4
-        with:
-          name: image-name
-          path: ./
-        continue-on-error: true
 
       - name: Setup SSH key
         run: |
@@ -68,24 +60,11 @@ jobs:
           echo "image=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
           echo "🚀 Final image name: $IMAGE_NAME"
 
-      - name: Create .env file
-        run: |
-          IMAGE_NAME="${{ steps.get-image.outputs.image }}"
-          
-          echo "IMG_NAME=$IMAGE_NAME" > .env
-          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN_DEV }}" >> .env
-          echo "BOT_APP_URL=${{ secrets.BOT_APP_URL_DEV }}" >> .env
-          echo "YOLO_SERVER_URL=${{ secrets.YOLO_SERVER_URL_DEV }}" >> .env
-          echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME_DEV }}" >> .env
-          
-          echo "📝 Contents of .env file:"
-          cat .env
-
       - name: SSH and deploy using Docker Compose
         run: |
-          scp -i key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.DEV_POLYBOT_HOST }}:/home/ubuntu/PolybotServicePython/.env
+          scp -i key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.POLYBOT_EC2_IP_DEV }}:/home/ubuntu/PolybotServicePython/.env
 
-          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.DEV_POLYBOT_HOST }} << 'EOF'
+          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.POLYBOT_EC2_IP_DEV }} << 'EOF'
             echo "📁 Cloning or updating repo"
             if [ -d "PolybotServicePython" ]; then
               cd PolybotServicePython
@@ -95,10 +74,7 @@ jobs:
               git clone --branch dev https://github.com/${{ github.repository }} PolybotServicePython
               cd PolybotServicePython
             fi
-          
-            echo "📝 Checking .env file contents on server:"
-            cat .env
-                    
+
             echo "[+] Checking for Docker"
             if ! command -v docker &> /dev/null; then
               echo "📦 Installing Docker..."
@@ -113,12 +89,4 @@ jobs:
             echo "🐳 Running Docker Compose for Dev"
             docker compose -f docker-compose.dev.yaml pull
             docker compose -f docker-compose.dev.yaml up -d --remove-orphans
-
-            echo "🔍 Verifying OpenTelemetry metrics endpoint"
-            if curl -s http://localhost:8889/metrics | grep -q 'system_cpu_time'; then
-              echo "✅ OpenTelemetry metrics are exposed"
-            else
-              echo "⚠️ Metrics not available"
-              docker logs $(docker ps -qf "name=otelcol") 2>/dev/null || echo "No otelcol container found"
-            fi
           EOF
