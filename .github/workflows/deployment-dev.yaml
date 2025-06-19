@@ -86,15 +86,16 @@ jobs:
           scp -i key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.DEV_POLYBOT_HOST }}:/home/ubuntu/PolybotServicePython/.env
           ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.DEV_POLYBOT_HOST }} << 'EOF'
             echo " Cloning or updating repo"
-            if [ -d "PolybotServicePython" ]; then
-              cd PolybotServicePython
-              git checkout dev
-              git pull origin dev
+          
+            cd /home/ubuntu
+
+            if [ ! -d "PolybotServicePython/.git" ]; then
+              rm -rf PolybotServicePython
+              git clone --branch dev https://github.com/nataliea772/PolybotServicePython.git PolybotServicePython
             else
-              git clone --branch dev https://github.com/${{ github.repository }} PolybotServicePython
               cd PolybotServicePython
-              git checkout dev
-              git pull origin dev
+              git fetch origin dev
+              git reset --hard origin/dev
             fi
           
             echo " Checking .env file contents on server:"
