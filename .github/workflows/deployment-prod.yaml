@@ -82,9 +82,9 @@ jobs:
 
       - name: SSH and deploy using Docker Compose
         run: |
-          scp -i key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.POLYBOT_EC2_IP_DEV }}:/home/ubuntu/PolybotServicePython/.env
+          scp -i key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.PROD_POLYBOT_HOST }}:/home/ubuntu/PolybotServicePython/.env
 
-          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.POLYBOT_EC2_IP_DEV }} << 'EOF'
+          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.PROD_POLYBOT_HOST }} << 'EOF'
             echo " Cloning or updating repo"
             if [ -d "PolybotServicePython" ]; then
               cd PolybotServicePython
