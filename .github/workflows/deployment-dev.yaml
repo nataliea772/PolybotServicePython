@@ -45,8 +45,8 @@ jobs:
 
       - name: Setup SSH key
         run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > nataliea772.pem
-          chmod 600 nataliea772.pem
+          echo "${{ secrets.SSH_PRIVATE_KEY_DEV }}" > key.pem
+          chmod 600 key.pem
 
       - name: Determine image name
         id: get-image
@@ -82,9 +82,9 @@ jobs:
 
       - name: SSH and deploy using Docker Compose
         run: |
-          scp -i nataliea772.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.DEV_POLYBOT_HOST }}:/home/ubuntu/PolybotServicePython/.env
+          scp -i key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.DEV_POLYBOT_HOST }}:/home/ubuntu/PolybotServicePython/.env
 
-          ssh -i nataliea772.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.DEV_POLYBOT_HOST }} << 'EOF'
+          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.DEV_POLYBOT_HOST }} << 'EOF'
             echo " Cloning or updating repo"
             if [ -d "PolybotServicePython" ]; then
               cd PolybotServicePython
