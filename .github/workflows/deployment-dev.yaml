@@ -70,7 +70,10 @@ jobs:
           
           ssh ec2 <<EOF
           set -e 
-          cd ~/polybot
+          if [ ! -d ~/PolybotServicePython ]; then
+            git clone https://github.com/nataliea772/PolybotServicePython.git ~/PolybotServicePython
+          fi
+          cd ~/PolybotServicePython
           git fetch origin
           git reset --hard origin/dev
     
