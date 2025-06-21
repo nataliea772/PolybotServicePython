@@ -34,7 +34,7 @@ jobs:
     uses: ./.github/workflows/deployment-dev.yaml
 
     with:
-      image: ${{ needs.build.outputs.image }}
+      image: nataliea7/polybot-dev:${{ github.run_number }}
 
     secrets:
       SSH_PRIVATE_KEY_DEV: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
