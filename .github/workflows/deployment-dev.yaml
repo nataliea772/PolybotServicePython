@@ -1,5 +1,6 @@
 name: Polybot Deploy Dev
 
+
 on:
   workflow_call:
     inputs:
@@ -23,13 +24,18 @@ on:
         required: true
       BOT_APP_URL_DEV:
         required: true
+  #      SQS_URL_DEV:
+#        required: true
+#      TABLE_NAME_DEV:
+#        required: true
+
+
 
   workflow_dispatch:
     inputs:
       image:
         required: true
         type: string
-        description: 'Docker image name to deploy'
 
 jobs:
   deploy:
@@ -37,55 +43,61 @@ jobs:
 
     steps:
       - name: Configure SSH
+
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY_DEV }}" > ~/.ssh/private_key
           chmod 600 ~/.ssh/private_key
           cat > ~/.ssh/config <<EOF
-Host ec2
-  HostName ${{ secrets.DEV_POLYBOT_HOST }}
-  User ${{ secrets.USERNAME }}
-  IdentityFile ~/.ssh/private_key
-  StrictHostKeyChecking no
-EOF
+          Host ec2
+            HostName ${{ secrets.DEV_POLYBOT_HOST }}
+            User ${{ secrets.USERNAME }}
+            IdentityFile ~/.ssh/private_key
+            StrictHostKeyChecking no
+          EOF
+
+
 
       - name: Debug output image
-        run: echo "Image passed: ${{ inputs.image }}"
+        run: |
+          echo "Image passed: ${{ inputs.image }}"
+
 
       - name: Trigger Docker Compose remotely
         env:
-          YOLO_URL_DEV: ${{ secrets.YOLO_SERVER_URL_DEV }}
+          YOLO_SERVER_URL_DEV: ${{ secrets.YOLO_SERVER_URL_DEV }}
         run: |
+          
           ssh ec2 <<EOF
-          set -e
-
+          set -e 
           if [ ! -d ~/PolybotServicePython ]; then
             git clone https://github.com/nataliea772/PolybotServicePython.git ~/PolybotServicePython
           fi
-
           cd ~/PolybotServicePython
           git fetch origin
           git reset --hard origin/dev
-
+    
           sudo rm -f .env
           touch .env && chmod 644 .env
-
-          echo "IMG_NAME=${{ inputs.image }}" > .env
+          
+          echo "IMG_NAME=${{ inputs.image }}"  > .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN_DEV }}" >> .env
-          echo "BOT_APP_URL=${{ secrets.BOT_APP_URL_DEV }}" >> .env
-          echo "YOLO_URL=http://$YOLO_URL_DEV:8080" >> .env
+          echo "BOT_APP_URL_DEV=natalie-bot-dev.fursa.click" >> .env
+          echo "YOLO_SERVER_URL_DEV=http://YOLO_SERVER_URL_DEV:8080" >> .env
           echo "REGION=${{ secrets.REGION }}" >> .env
           echo "BUCKET_NAME=${{ secrets.S3_BUCKET_NAME_DEV }}" >> .env
           echo "POLYBOT_ENV=dev" >> .env
+          echo "SQS_URL=${{ secrets.SQS_URL_DEV }}" >> .env
           echo "CALLBACK_BASE_URL=natalie-bot-dev.fursa.click" >> .env
-
+          echo "DDB_TABLE_NAME=${{secrets.TABLE_NAME_DEV }}" >> .env
+          
           echo "🔍 .env file content:"
-          cat .env
-
+          cat .env  # debug output
+          
           echo "🧹 Removing old container (if exists)..."
           sudo docker rm -f polybotservicepython-polybot-1 || true
-
+          
           echo "🐳 Docker Compose pull + up"
           sudo docker compose -f docker-compose.dev.yaml pull
-          sudo docker compose -f docker-compose.dev.yaml up -d --remove-orphans
-EOF
+          sudo docker compose -f docker-compose.dev.yaml up -d
+          EOF
