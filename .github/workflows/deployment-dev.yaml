@@ -95,7 +95,14 @@ jobs:
           cat .env  # debug output
           
           echo "🧹 Removing old container (if exists)..."
-          sudo docker rm -f polybotservicepython-polybot-1 || true
+          CONTAINER_ID=$(sudo docker ps -a -q -f name=polybotservicepython-polybot-1)
+          if [ -n "$CONTAINER_ID" ]; then
+            echo "Found container ID: $CONTAINER_ID, removing..."
+            sudo docker stop $CONTAINER_ID || true
+            sudo docker rm $CONTAINER_ID || true
+          else
+            echo "No container to remove."
+          fi
           
           echo "🐳 Docker Compose pull + up"
           sudo docker compose -f docker-compose.dev.yaml pull
