@@ -94,14 +94,16 @@ jobs:
           echo "🔍 .env file content:"
           cat .env  # debug output
           
-          echo "🧹 Removing old container (if exists)..."
-          CONTAINER_ID=$(sudo docker ps -a -q -f name=polybotservicepython-polybot-1)
+          echo "🧹 Searching for and removing old container..."
+
+          CONTAINER_ID=$(sudo docker ps -a --format '{{.ID}} {{.Names}}' | grep polybotservicepython-polybot-1 | awk '{print $1}')
+          
           if [ -n "$CONTAINER_ID" ]; then
-            echo "Found container ID: $CONTAINER_ID, removing..."
-            sudo docker stop $CONTAINER_ID || true
-            sudo docker rm $CONTAINER_ID || true
+            echo "Found container ID: $CONTAINER_ID, attempting stop & remove..."
+            sudo docker stop $CONTAINER_ID || echo "⚠️ Failed to stop container"
+            sudo docker rm $CONTAINER_ID || echo "⚠️ Failed to remove container"
           else
-            echo "No container to remove."
+            echo "No matching container found."
           fi
           
           echo "🐳 Docker Compose pull + up"
