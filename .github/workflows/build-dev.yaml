@@ -31,7 +31,7 @@ jobs:
 
   deploy:
     needs: build
-    uses: nataliea772/PolybotInfra/.github/workflows/deployment-dev.yaml@dev  # adjust if your repo/branch are different
+    uses: ./.github/workflows/deployment-dev.yaml@dev
 
     with:
       image: ${{ needs.build.outputs.image }}
