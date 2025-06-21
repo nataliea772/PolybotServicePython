@@ -1,39 +1,65 @@
-version: '3.8'
-
 services:
   polybot:
     image: ${IMG_NAME}
-    restart: always
     ports:
       - "8080:8080"
-    env_file: .env
-    networks:
-      - observability
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    env_file:
+      - .env
+    restart: unless-stopped
+    depends_on:
+      - otelcol
+
 
   otelcol:
     image: otel/opentelemetry-collector-contrib:latest
-    restart: always
-    command: ["--config", "/etc/otelcol/config.yaml"]
-    ports:
-      - "8889:8889"
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol/config.yaml"]
+    container_name: otelcol
     volumes:
       - ./otelcol-config.yaml:/etc/otelcol/config.yaml
-      - /proc:/host_proc:ro
-      - /sys:/host_sys:ro
+      - /proc:/hostfs/proc:ro
+      - /sys:/hostfs/sys:ro
+    ports:
+      - "8889:8889"  # Prometheus scraper port
     environment:
-      - HOST_PROC=/host_proc
-      - HOST_SYS=/host_sys
-    networks:
-      - observability
-    depends_on:
-      polybot:
-        condition: service_healthy
-
-networks:
-  observability:
-    driver: bridge
+      - HOST_PROC=/hostfs/proc
+      - HOST_SYS=/hostfs/sys
+#version: '3.8'
+#
+#services:
+#  polybot:
+#    image: ${IMG_NAME}
+#    restart: always
+#    ports:
+#      - "8080:8080"
+#    env_file: .env
+#    networks:
+#      - observability
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+#
+#  otelcol:
+#    image: otel/opentelemetry-collector-contrib:latest
+#    restart: always
+#    command: ["--config", "/etc/otelcol/config.yaml"]
+#    ports:
+#      - "8889:8889"
+#    volumes:
+#      - ./otelcol-config.yaml:/etc/otelcol/config.yaml
+#      - /proc:/host_proc:ro
+#      - /sys:/host_sys:ro
+#    environment:
+#      - HOST_PROC=/host_proc
+#      - HOST_SYS=/host_sys
+#    networks:
+#      - observability
+#    depends_on:
+#      polybot:
+#        condition: service_healthy
+#
+#networks:
+#  observability:
+#    driver: bridge
