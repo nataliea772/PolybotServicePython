@@ -93,6 +93,6 @@ jobs:
           
           cat .env  # debug output
     
-          docker compose -f docker-compose.dev.yaml pull
-          docker compose -f docker-compose.dev.yaml up -d
+          sudo docker compose -f docker-compose.dev.yaml pull
+          sudo docker compose -f docker-compose.dev.yaml up -d
           EOF
