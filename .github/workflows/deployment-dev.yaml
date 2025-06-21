@@ -22,7 +22,7 @@ on:
         required: true
       S3_BUCKET_NAME_DEV:
         required: true
-      BOT_APPURL_DEV:
+      BOT_APP_URL_DEV:
         required: true
   #      SQS_URL_DEV:
 #        required: true
