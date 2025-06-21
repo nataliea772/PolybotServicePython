@@ -22,16 +22,17 @@ on:
         required: true
       S3_BUCKET_NAME_DEV:
         required: true
-#      SQS_URL_DEV:
-#        required: true
-#      TABLE_NAME_DEV:
-#        required: true
+  #      SQS_URL_DEV:
+  #        required: true
+  #      TABLE_NAME_DEV:
+  #        required: true
 
   workflow_dispatch:
     inputs:
       image:
         required: true
         type: string
+        description:
 
 jobs:
   deploy:
