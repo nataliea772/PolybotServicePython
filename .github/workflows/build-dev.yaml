@@ -1,0 +1,49 @@
+name: Polybot Build Dev
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.build_and_push.outputs.image }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Docker Login
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build and Push Image
+        id: build_and_push
+        run: |
+          img=nataliea7/polybot-dev:${{ github.run_number }}
+          docker build -t $img .
+          docker push $img
+          echo "image=$img" >> "$GITHUB_OUTPUT"
+
+      - name: Confirm output
+        run: |
+          echo "Built image: ${{ steps.build_and_push.outputs.image }}"
+
+  deploy:
+    needs: build
+    uses: ./.github/workflows/deployment-dev.yaml
+
+    with:
+      image: nataliea7/polybot-dev:${{ github.run_number }}
+
+    secrets:
+      SSH_PRIVATE_KEY_DEV: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
+      DEV_POLYBOT_HOST: ${{ secrets.DEV_POLYBOT_HOST }}
+      TELEGRAM_BOT_TOKEN_DEV: ${{ secrets.TELEGRAM_BOT_TOKEN_DEV }}
+      USERNAME: ${{ secrets.USERNAME }}
+      BOT_APP_URL: ${{ secrets.BOT_APP_URL_DEV }}
+      YOLO_SERVER_URL: ${{ secrets.YOLO_SERVER_URL_DEV }}
+      S3_BUCKET_NAME_DEV: ${{ secrets.S3_BUCKET_NAME_DEV }}
+      REGION: ${{ secrets.REGION }}
+#      SQS_URL_DEV: ${{ secrets.SQS_URL_DEV }}
+#      TABLE_NAME_DEV: ${{ secrets.TABLE_NAME_DEV }}

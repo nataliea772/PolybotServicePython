@@ -1,31 +1,103 @@
-# .GitHub/workflows/deployment-dev.yaml
+name: Polybot Deploy Dev
 
-name: Deploy to Dev Polybot
 
 on:
-  push:
-    branches:
-      - dev
+  workflow_call:
+    inputs:
+      image:
+        required: true
+        type: string
+    secrets:
+      SSH_PRIVATE_KEY_DEV:
+        required: true
+      DEV_POLYBOT_HOST:
+        required: true
+      USERNAME:
+        required: true
+      TELEGRAM_BOT_TOKEN_DEV:
+        required: true
+      YOLO_SERVER_URL:
+        required: true
+      REGION:
+        required: true
+      S3_BUCKET_NAME_DEV:
+        required: true
+      BOT_APP_URL:
+        required: true
+  #      SQS_URL_DEV:
+#        required: true
+#      TABLE_NAME_DEV:
+#        required: true
+
+
+
+  workflow_dispatch:
+    inputs:
+      image:
+        required: true
+        type: string
 
 jobs:
-  deploy-dev:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Configure SSH
 
-      - name: Print debugging info
         run: |
-          echo "Branch ref: ${{ github.ref }}"
-          echo "Running deploy-dev.sh on DEV EC2"
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY_DEV }}" > ~/.ssh/private_key
+          chmod 600 ~/.ssh/private_key
+          cat > ~/.ssh/config <<EOF
+          Host ec2
+            HostName ${{ secrets.DEV_POLYBOT_HOST }}
+            User ${{ secrets.USERNAME }}
+            IdentityFile ~/.ssh/private_key
+            StrictHostKeyChecking no
+          EOF
 
-      - name: SSH into Dev EC2 and deploy
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.DEV_POLYBOT_HOST }}
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
-          script: |
-            echo "RUNNING: bash /home/ubuntu/deploy-dev.sh"
-            bash /home/ubuntu/deploy-dev.sh
+
+
+      - name: Debug output image
+        run: |
+          echo "Image passed: ${{ inputs.image }}"
+
+
+      - name: Trigger Docker Compose remotely
+        env:
+          YOLO_SERVER_URL: ${{ secrets.YOLO_SERVER_URL_DEV }}
+        run: |
+          
+          ssh ec2 <<EOF
+          set -e 
+          if [ ! -d ~/PolybotServicePython ]; then
+            git clone https://github.com/nataliea772/PolybotServicePython.git ~/PolybotServicePython
+          fi
+          cd ~/PolybotServicePython
+          git fetch origin
+          git reset --hard origin/dev
+    
+          sudo rm -f .env
+          touch .env && chmod 644 .env
+          
+          echo "IMG_NAME=${{ inputs.image }}"  > .env
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN_DEV }}" >> .env
+          echo "BOT_APP_URL=natalie-bot-dev.fursa.click" >> .env
+          echo "YOLO_SERVER_URL=http://10.0.1.69:8080" >> .env
+          echo "REGION=${{ secrets.REGION }}" >> .env
+          echo "BUCKET_NAME=${{ secrets.S3_BUCKET_NAME_DEV }}" >> .env
+          echo "POLYBOT_ENV=dev" >> .env
+          echo "SQS_URL=${{ secrets.SQS_URL_DEV }}" >> .env
+          echo "CALLBACK_BASE_URL=natalie-bot-dev.fursa.click" >> .env
+          echo "DDB_TABLE_NAME=${{secrets.TABLE_NAME_DEV }}" >> .env
+          
+          echo "🔍 .env file content:"
+          cat .env  # debug output
+          
+          echo "🧹 Cleaning existing docker-compose stack..."
+          sudo docker compose -f docker-compose.dev.yaml down --remove-orphans || echo "⚠️ Failed to bring down stack"
+
+          echo "🐳 Docker Compose pull + up"
+          sudo docker compose -f docker-compose.dev.yaml pull
+          sudo docker compose -f docker-compose.dev.yaml up -d
+          EOF

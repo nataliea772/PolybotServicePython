@@ -18,24 +18,23 @@ def index():
 def webhook():
     try:
         req = request.get_json()
-        print("Webhook received:", req)  # Log raw request
+        print("✅ Webhook payload received:", req)
+
         message = req.get('message')
         if not message:
-            print("No message found in request")
-            return 'Missing message', 400
+            print("⚠️ No 'message' field found in payload!")
+            return "Bad request", 400
+
         bot.handle_message(req['message'])
         return 'Ok'
     except Exception as e:
-        print("Error in webhook:", str(e))
+        print("❌ ERROR inside webhook:", e)
+        import traceback
+        traceback.print_exc()
         return 'Internal Error', 500
 
 
 bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, BOT_APP_URL)
 
 if __name__ == "__main__":
-    bot.setWebhook(f"{BOT_APP_URL}/{TELEGRAM_BOT_TOKEN}/")  #This tells Telegram where to send updates
-    context = (
-        "/home/ubuntu/fullchain.pem",      # Cert
-        "/home/ubuntu/privkey.pem",        # Private key you also need to copy
-    )
-    app.run(host='0.0.0.0', port=8443)
+    app.run(host='0.0.0.0', port=8080)

@@ -1,0 +1,32 @@
+services:
+  polybot:
+    image: ${IMG_NAME}
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    networks:
+      - observability
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  otelcol:
+    image: otel/opentelemetry-collector-contrib:latest
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol/config.yaml"]
+    container_name: otelcol
+    volumes:
+      - ./otelcol-config.yaml:/etc/otelcol/config.yaml
+      - /proc:/host_proc:ro
+      - /sys:/host_sys:ro
+    environment:
+      - HOST_PROC=/host_proc
+      - HOST_SYS=/host_sys
+    networks:
+      - observability
+
+networks:
+  observability:

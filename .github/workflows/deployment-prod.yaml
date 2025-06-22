@@ -1,24 +1,103 @@
-# .GitHub/workflows/deployment-prod.yaml
-name: Deploy to Prod Polybot
+name: Polybot Deploy Prod
+
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
+    inputs:
+      image:
+        required: true
+        type: string
+    secrets:
+      SSH_PRIVATE_KEY_PROD:
+        required: true
+      PROD_POLYBOT_HOST:
+        required: true
+      USERNAME:
+        required: true
+      TELEGRAM_BOT_TOKEN_PROD:
+        required: true
+      YOLO_SERVER_URL:
+        required: true
+      REGION:
+        required: true
+      S3_BUCKET_NAME_PROD:
+        required: true
+      BOT_APP_URL:
+        required: true
+  #      SQS_URL_DEV:
+#        required: true
+#      TABLE_NAME_DEV:
+#        required: true
+
+
+
+  workflow_dispatch:
+    inputs:
+      image:
+        required: true
+        type: string
 
 jobs:
-  deploy-prod:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Configure SSH
 
-      - name: Setup SSH and deploy to prod EC2
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.PROD_POLYBOT_HOST }}
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY_PROD }}
-          script: |
-            bash /home/ubuntu/deploy-prod.sh
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY_PROD }}" > ~/.ssh/private_key
+          chmod 600 ~/.ssh/private_key
+          cat > ~/.ssh/config <<EOF
+          Host ec2
+            HostName ${{ secrets.PROD_POLYBOT_HOST }}
+            User ${{ secrets.USERNAME }}
+            IdentityFile ~/.ssh/private_key
+            StrictHostKeyChecking no
+          EOF
+
+
+
+      - name: Debug output image
+        run: |
+          echo "Image passed: ${{ inputs.image }}"
+
+
+      - name: Trigger Docker Compose remotely
+        env:
+          YOLO_SERVER_URL: ${{ secrets.YOLO_SERVER_URL_PROD }}
+        run: |
+          
+          ssh ec2 <<EOF
+          set -e 
+          if [ ! -d ~/PolybotServicePython ]; then
+            git clone https://github.com/nataliea772/PolybotServicePython.git ~/PolybotServicePython
+          fi
+          cd ~/PolybotServicePython
+          git fetch origin
+          git reset --hard origin/main
+    
+          sudo rm -f .env
+          touch .env && chmod 644 .env
+          
+          echo "IMG_NAME=${{ inputs.image }}"  > .env
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN_PROD }}" >> .env
+          echo "BOT_APP_URL=natalie-bot-prod.fursa.click" >> .env
+          echo "YOLO_SERVER_URL=http://18.144.50.94:8080" >> .env
+          echo "REGION=${{ secrets.REGION }}" >> .env
+          echo "BUCKET_NAME=${{ secrets.S3_BUCKET_NAME_PROD }}" >> .env
+          echo "POLYBOT_ENV=prod" >> .env
+#          echo "SQS_URL=${{ secrets.SQS_URL_PROD }}" >> .env
+#          echo "CALLBACK_BASE_URL=natalie-bot-prod.fursa.click" >> .env
+#          echo "DDB_TABLE_NAME=${{secrets.TABLE_NAME_PROD }}" >> .env
+          
+          echo "🔍 .env file content:"
+          cat .env  # debug output
+          
+          echo "🧹 Cleaning existing docker-compose stack..."
+          sudo docker compose -f docker-compose.dev.yaml down --remove-orphans || echo "⚠️ Failed to bring down stack"
+
+          echo "🐳 Docker Compose pull + up"
+          sudo docker compose -f docker-compose.dev.yaml pull
+          sudo docker compose -f docker-compose.dev.yaml up -d
+          EOF
