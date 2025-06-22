@@ -248,7 +248,7 @@ class ImageProcessingBot(Bot):
                     logger.error("YOLO_SERVER_URL not set in prod environment.")
                     self.send_text(chat_id, "Server error: YOLO IP not configured.")
                     return
-                yolo_url = f"http://{yolo_ip}:8080/predict"
+                yolo_url = f"{yolo_ip}/predict"
             else:
                 yolo_url = "http://localhost:8080/predict"
 
