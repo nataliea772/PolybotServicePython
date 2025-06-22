@@ -20,11 +20,6 @@ class Bot:
         self.telegram_bot_client.remove_webhook()
         time.sleep(0.5)
 
-        # set the webhook URL
-        # self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60)
-
-        # CERTIFICATE_FILE_PATH = "polybot_dev.crt"
-
         ENV = os.environ.get("ENV", "dev").lower()
         if ENV == "dev":
             CERTIFICATE_FILE_PATH = "/app/polybot/polybot-dev.crt"
@@ -251,13 +246,6 @@ class ImageProcessingBot(Bot):
                 yolo_url = f"{yolo_ip}/predict"
             else:
                 yolo_url = "http://localhost:8080/predict"
-
-            # yolo_ip = os.environ.get("YOLO_PRIVATE_IP")
-            # if not yolo_ip:
-            #     logger.error("YOLO_PRIVATE_IP not set in environment.")
-            #     self.send_text(chat_id, "Server error: YOLO IP not configured.")
-            #     return
-            # yolo_url = f"{yolo_ip}/predict"
 
             image_path = session["images"][-1]
 
