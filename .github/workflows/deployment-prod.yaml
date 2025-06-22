@@ -67,18 +67,18 @@ jobs:
         env:
           YOLO_SERVER_URL: ${{ secrets.YOLO_SERVER_URL_PROD }}
         run: |
-          ssh ec2 <<EOF
-          set -e 
+          ssh ec2 'bash -s' <<'ENDSSH'
+          set -e
           if [ ! -d ~/PolybotServicePython ]; then
             git clone https://github.com/nataliea772/PolybotServicePython.git ~/PolybotServicePython
           fi
           cd ~/PolybotServicePython
           git fetch origin
           git reset --hard origin/main
-
+      
           sudo rm -f .env
           touch .env && chmod 644 .env
-
+      
           echo "IMG_NAME=${{ inputs.image }}"  > .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN_PROD }}" >> .env
           echo "BOT_APP_URL=${{ secrets.BOT_APP_URL }}" >> .env
@@ -86,14 +86,15 @@ jobs:
           echo "REGION=${{ secrets.REGION }}" >> .env
           echo "BUCKET_NAME=${{ secrets.S3_BUCKET_NAME_PROD }}" >> .env
           echo "POLYBOT_ENV=prod" >> .env
-
+      
           echo ".env file content:"
           cat .env
-
+      
           echo "🧹 Cleaning existing docker-compose stack..."
           sudo docker compose -f docker-compose.prod.yaml down --remove-orphans || echo "⚠️ Failed to bring down stack"
-
+      
           echo "🐳 Docker Compose pull + up"
           sudo docker compose -f docker-compose.prod.yaml pull
-          sudo docker compose -f docker-compose.prod.yaml up -d
-          EOF
+          sudo docker compose -f docker-compose.prod.yaml up -d --build
+          ENDSSH
+
