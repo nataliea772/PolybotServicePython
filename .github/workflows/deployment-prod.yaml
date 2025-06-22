@@ -1,6 +1,5 @@
 name: Polybot Deploy Prod
 
-
 on:
   workflow_call:
     inputs:
@@ -24,12 +23,6 @@ on:
         required: true
       BOT_APP_URL:
         required: true
-  #      SQS_URL_DEV:
-#        required: true
-#      TABLE_NAME_DEV:
-#        required: true
-
-
 
   workflow_dispatch:
     inputs:
@@ -52,44 +45,36 @@ jobs:
           echo "  User ${{ secrets.USERNAME }}" >> ~/.ssh/config
           echo "  IdentityFile ~/.ssh/private_key" >> ~/.ssh/config
           echo "  StrictHostKeyChecking no" >> ~/.ssh/config
-      
 
       - name: Debug output image
         run: |
           echo "Image passed: ${{ inputs.image }}"
 
-
       - name: Trigger Docker Compose remotely
-        env:
-          YOLO_SERVER_URL: ${{ secrets.YOLO_SERVER_URL_PROD }}
         run: |
-          
-          ssh ec2 <<EOF
-          set -e 
+          ssh ec2 <<'EOF'
+          set -e
           if [ ! -d ~/PolybotServicePython ]; then
             git clone https://github.com/nataliea772/PolybotServicePython.git ~/PolybotServicePython
           fi
           cd ~/PolybotServicePython
           git fetch origin
           git reset --hard origin/main
-    
+
           sudo rm -f .env
           touch .env && chmod 644 .env
-          
-          echo "IMG_NAME=${{ inputs.image }}"  > .env
+
+          echo "IMG_NAME=${{ inputs.image }}" > .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN_PROD }}" >> .env
-          echo "BOT_APP_URL=natalie-bot-prod.fursa.click" >> .env
-          echo "YOLO_SERVER_URL=http://18.144.50.94:8080" >> .env
+          echo "BOT_APP_URL=${{ secrets.BOT_APP_URL }}" >> .env
+          echo "YOLO_SERVER_URL=${{ secrets.YOLO_SERVER_URL }}" >> .env
           echo "REGION=${{ secrets.REGION }}" >> .env
           echo "BUCKET_NAME=${{ secrets.S3_BUCKET_NAME_PROD }}" >> .env
           echo "POLYBOT_ENV=prod" >> .env
-#          echo "SQS_URL=${{ secrets.SQS_URL_PROD }}" >> .env
-#          echo "CALLBACK_BASE_URL=natalie-bot-prod.fursa.click" >> .env
-#          echo "DDB_TABLE_NAME=${{secrets.TABLE_NAME_PROD }}" >> .env
 
           echo "🔍 .env file content:"
-          cat .env  # debug output
-          
+          cat .env
+
           echo "🧹 Cleaning existing docker-compose stack..."
           sudo docker compose -f docker-compose.prod.yaml down --remove-orphans || echo "⚠️ Failed to bring down stack"
 
