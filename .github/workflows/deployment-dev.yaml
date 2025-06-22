@@ -16,7 +16,7 @@ on:
         required: true
       TELEGRAM_BOT_TOKEN_DEV:
         required: true
-      YOLO_SERVER_URL_DEV:
+      YOLO_SERVER_URL:
         required: true
       REGION:
         required: true
@@ -65,7 +65,7 @@ jobs:
 
       - name: Trigger Docker Compose remotely
         env:
-          YOLO_SERVER_URL_DEV: ${{ secrets.YOLO_SERVER_URL_DEV }}
+          YOLO_SERVER_URL: ${{ secrets.YOLO_SERVER_URL_DEV }}
         run: |
           
           ssh ec2 <<EOF
@@ -83,7 +83,7 @@ jobs:
           echo "IMG_NAME=${{ inputs.image }}"  > .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN_DEV }}" >> .env
           echo "BOT_APP_URL=natalie-bot-dev.fursa.click" >> .env
-          echo "YOLO_SERVER_URL_DEV=http://10.0.1.69:8080" >> .env
+          echo "YOLO_PRIVATE_IP=http://10.0.1.69:8080" >> .env
           echo "REGION=${{ secrets.REGION }}" >> .env
           echo "BUCKET_NAME=${{ secrets.S3_BUCKET_NAME_DEV }}" >> .env
           echo "POLYBOT_ENV=dev" >> .env

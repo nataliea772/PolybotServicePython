@@ -243,9 +243,9 @@ class ImageProcessingBot(Bot):
 
             ENV = os.environ.get("ENV", "dev").lower()
             if ENV == "prod" or ENV == "dev":
-                yolo_ip = os.environ.get("DEV_YOLO_HOST")
+                yolo_ip = os.environ.get("YOLO_SERVER_URL")
                 if not yolo_ip:
-                    logger.error("YOLO_PRIVATE_IP not set in prod environment.")
+                    logger.error("YOLO_SERVER_URL not set in prod environment.")
                     self.send_text(chat_id, "Server error: YOLO IP not configured.")
                     return
                 yolo_url = f"http://{yolo_ip}:8080/predict"
