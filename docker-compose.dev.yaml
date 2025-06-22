@@ -5,9 +5,13 @@ services:
       - "8080:8080"
     env_file:
       - .env
-    restart: unless-stopped
-    depends_on:
-      - otelcol
+    networks:
+      - observability
+    healthcheck:
+        test: [ "CMD", "curl", "-f", "http://localhost:8080/" ]
+        interval: 10s
+        timeout: 5s
+        retries: 5
 
 
   otelcol:
