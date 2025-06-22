@@ -43,20 +43,16 @@ jobs:
 
     steps:
       - name: Configure SSH
-
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY_PROD }}" > ~/.ssh/private_key
           chmod 600 ~/.ssh/private_key
-          cat > ~/.ssh/config <<EOF
-          Host ec2
-            HostName ${{ secrets.PROD_POLYBOT_HOST }}
-            User ${{ secrets.USERNAME }}
-            IdentityFile ~/.ssh/private_key
-            StrictHostKeyChecking no
-          EOF
-
-
+          echo "Host ec2" > ~/.ssh/config
+          echo "  HostName ${{ secrets.PROD_POLYBOT_HOST }}" >> ~/.ssh/config
+          echo "  User ${{ secrets.USERNAME }}" >> ~/.ssh/config
+          echo "  IdentityFile ~/.ssh/private_key" >> ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+      
 
       - name: Debug output image
         run: |
