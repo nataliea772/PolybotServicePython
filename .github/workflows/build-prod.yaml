@@ -31,10 +31,10 @@ jobs:
 
   deploy:
     needs: build
-    uses: ./.github/workflows/deployment-dev.yaml
+    uses: ./.github/workflows/deployment-prod.yaml
 
     with:
-      image: nataliea7/polybot-dev:${{ github.run_number }}
+      image: nataliea7/polybot-prod:${{ github.run_number }}
 
     secrets:
       SSH_PRIVATE_KEY_PROD: ${{ secrets.SSH_PRIVATE_KEY_PROD }}
