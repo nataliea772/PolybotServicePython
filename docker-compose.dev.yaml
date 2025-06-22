@@ -8,11 +8,10 @@ services:
     networks:
       - observability
     healthcheck:
-        test: [ "CMD", "curl", "-f", "http://localhost:8080/" ]
-        interval: 10s
-        timeout: 5s
-        retries: 5
-
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   otelcol:
     image: otel/opentelemetry-collector-contrib:latest
@@ -26,4 +25,8 @@ services:
     environment:
       - HOST_PROC=/host_proc
       - HOST_SYS=/host_sys
-    network_mode: host
+    networks:
+      - observability
+
+networks:
+  observability:
