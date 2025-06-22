@@ -95,9 +95,9 @@ jobs:
           cat .env  # debug output
           
           echo "🧹 Cleaning existing docker-compose stack..."
-          sudo docker compose -f docker-compose.dev.yaml down --remove-orphans || echo "⚠️ Failed to bring down stack"
+          sudo docker compose -f docker-compose.prod.yaml down --remove-orphans || echo "⚠️ Failed to bring down stack"
 
           echo "🐳 Docker Compose pull + up"
-          sudo docker compose -f docker-compose.dev.yaml pull
-          sudo docker compose -f docker-compose.dev.yaml up -d
+          sudo docker compose -f docker-compose.prod.yaml pull
+          sudo docker compose -f docker-compose.prod.yaml up -d
           EOF
