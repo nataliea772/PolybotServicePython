@@ -83,7 +83,7 @@ jobs:
           echo "IMG_NAME=${{ inputs.image }}"  > .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN_DEV }}" >> .env
           echo "BOT_APP_URL=natalie-bot-dev.fursa.click" >> .env
-          echo "YOLO_SERVER_URL_DEV=http://YOLO_SERVER_URL_DEV:8080" >> .env
+          echo "YOLO_SERVER_URL_DEV=http://10.0.1.69:8080" >> .env
           echo "REGION=${{ secrets.REGION }}" >> .env
           echo "BUCKET_NAME=${{ secrets.S3_BUCKET_NAME_DEV }}" >> .env
           echo "POLYBOT_ENV=dev" >> .env
