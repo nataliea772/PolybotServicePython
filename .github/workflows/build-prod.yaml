@@ -20,7 +20,7 @@ jobs:
       - name: Build and Push Image
         id: build_and_push
         run: |
-          img=nataliea7/polybot-dev:${{ github.run_number }}
+          img=nataliea7/polybot-prod:${{ github.run_number }}
           docker build -t $img .
           docker push $img
           echo "image=$img" >> "$GITHUB_OUTPUT"
