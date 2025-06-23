@@ -66,7 +66,7 @@ jobs:
 
           echo "IMG_NAME=${{ inputs.image }}" > .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN_PROD }}" >> .env
-          echo "BOT_APP_URL=${{ secrets.BOT_APP_URL }}" >> .env
+          echo "BOT_APP_URL=${{ secrets.BOT_APP_URL_PROD }}" >> .env
           echo "YOLO_SERVER_URL=${{ secrets.YOLO_SERVER_URL }}" >> .env
           echo "REGION=${{ secrets.REGION }}" >> .env
           echo "BUCKET_NAME=${{ secrets.S3_BUCKET_NAME_PROD }}" >> .env
