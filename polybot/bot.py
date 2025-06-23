@@ -26,28 +26,29 @@ class Bot:
         elif ENV == "prod":
             CERTIFICATE_FILE_PATH = "/app/polybot/polybot-prod.crt"
 
-        # with open(CERTIFICATE_FILE_PATH, 'r') as cert:
-        #     print("📌 BOT_APP_URL from environment:", os.getenv("BOT_APP_URL"))
-        #     self.telegram_bot_client.set_webhook(
-        #         url=f'{telegram_chat_url}/{token}/',
-        #         certificate=cert,
-        #         timeout=60
-        #     )
-        print("📡 Setting webhook...")
         with open(CERTIFICATE_FILE_PATH, 'r') as cert:
-            webhook_url = f'{telegram_chat_url}/{token}/'
-            print(f"👉 Webhook URL to be set: {webhook_url}")
-            try:
-                result = self.telegram_bot_client.set_webhook(
-                    url=webhook_url,
-                    certificate=cert,
-                    timeout=60
-                )
-                print(f"✅ set_webhook() response: {result}")
-            except Exception as e:
-                print(f"❌ Failed to set webhook: {e}")
-
-        logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
+            print("📌 BOT_APP_URL from environment:", os.getenv("BOT_APP_URL"))
+            self.telegram_bot_client.set_webhook(
+                # url=f'{telegram_chat_url}/{token}/',
+                url=f'{telegram_chat_url.rstrip("/")}/{token}/',
+                certificate=cert,
+                timeout=60
+            )
+        # print("📡 Setting webhook...")
+        # with open(CERTIFICATE_FILE_PATH, 'r') as cert:
+        #     webhook_url = f'{telegram_chat_url}/{token}/'
+        #     print(f"👉 Webhook URL to be set: {webhook_url}")
+        #     try:
+        #         result = self.telegram_bot_client.set_webhook(
+        #             url=webhook_url,
+        #             certificate=cert,
+        #             timeout=60
+        #         )
+        #         print(f"✅ set_webhook() response: {result}")
+        #     except Exception as e:
+        #         print(f"❌ Failed to set webhook: {e}")
+        #
+        # logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
 
     def send_text(self, chat_id, text):
         self.telegram_bot_client.send_message(chat_id, text)
