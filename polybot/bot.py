@@ -27,6 +27,7 @@ class Bot:
             CERTIFICATE_FILE_PATH = "/app/polybot/polybot-prod.crt"
 
         with open(CERTIFICATE_FILE_PATH, 'r') as cert:
+            print("📌 BOT_APP_URL from environment:", os.getenv("BOT_APP_URL"))
             self.telegram_bot_client.set_webhook(
                 url=f'{telegram_chat_url}/{token}/',
                 certificate=cert,
