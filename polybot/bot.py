@@ -12,7 +12,7 @@ user_sessions = {}
 class Bot:
 
     def __init__(self, token, telegram_chat_url):
-        # create a new instance of the TeleBot class.
+        # Create a new instance of the TeleBot class.
         # all communication with Telegram servers are done using self.telegram_bot_client
         self.telegram_bot_client = telebot.TeleBot(token)
 
@@ -24,7 +24,7 @@ class Bot:
         if ENV == "dev":
             CERTIFICATE_FILE_PATH = "/app/polybot/polybot-dev.crt"
         elif ENV == "prod":
-            CERTIFICATE_FILE_PATH = "/app/polybot/polybot.crt"
+            CERTIFICATE_FILE_PATH = "/app/polybot/polybot-prod.crt"
 
         with open(CERTIFICATE_FILE_PATH, 'r') as cert:
             self.telegram_bot_client.set_webhook(
