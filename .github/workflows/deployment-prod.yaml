@@ -70,7 +70,7 @@ jobs:
           echo "YOLO_SERVER_URL=${{ secrets.YOLO_SERVER_URL }}" >> .env
           echo "REGION=${{ secrets.REGION }}" >> .env
           echo "BUCKET_NAME=${{ secrets.S3_BUCKET_NAME_PROD }}" >> .env
-          echo "POLYBOT_ENV=prod" >> .env
+          echo "ENV=prod" >> .env
 
           echo "🔍 .env file content:"
           cat .env
