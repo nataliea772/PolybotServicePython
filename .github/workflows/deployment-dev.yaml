@@ -86,7 +86,7 @@ jobs:
           echo "YOLO_SERVER_URL=http://10.0.1.69:8080" >> .env
           echo "REGION=${{ secrets.REGION }}" >> .env
           echo "BUCKET_NAME=${{ secrets.S3_BUCKET_NAME_DEV }}" >> .env
-          echo "POLYBOT_ENV=dev" >> .env
+          echo "ENV=dev" >> .env
           echo "SQS_URL=${{ secrets.SQS_URL_DEV }}" >> .env
           echo "CALLBACK_BASE_URL=natalie-bot-dev.fursa.click" >> .env
           echo "DDB_TABLE_NAME=${{secrets.TABLE_NAME_DEV }}" >> .env
